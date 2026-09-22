@@ -15,8 +15,10 @@
   </script>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect rx='14' width='64' height='64' fill='%23201218'/%3E%3Cpath d='M14 44 31 11l7 15 12-6-7 13 8 5-15 1-5 14-5-13z' fill='%23e8b85a'/%3E%3Ccircle cx='31' cy='31' r='5' fill='%23912f2f'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="https://js.arcgis.com/4.33/esri/themes/dark/main.css">
-  <script src="https://js.arcgis.com/4.33/"></script>
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="datums-dragons-v2.css">
+  <script>window.datumsDragonsReady=false;window.addEventListener("load",()=>setTimeout(()=>{if(!window.datumsDragonsReady){const b=document.getElementById("startBtn");if(b){b.textContent="Game files did not load—check filenames";b.disabled=true}}},8000));</script>
+  <script defer src="https://js.arcgis.com/4.33/"></script>
+  <script defer src="datums-dragons-v2.js"></script>
 </head>
 <body>
   <main id="app" aria-label="Datums and Dragons game">
@@ -75,7 +77,5 @@
   <div class="modal" id="victoryModal" hidden>
     <div class="modal-card combat"><div class="loot">🏆</div><div class="eyebrow">The atlas is restored</div><h2>You defeated bad geography!</h2><p id="victoryText"></p><button class="game-btn wide" id="restartBtn">Play again</button></div>
   </div>
-
-  <script src="game.js"></script>
 </body>
 </html>
