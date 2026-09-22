@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Datums &amp; Dragons</title>
+  <meta name="description" content="A map-powered fantasy adventure rendered with ArcGIS Online.">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-HZWNB3WHS6"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-HZWNB3WHS6');
+  </script>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect rx='14' width='64' height='64' fill='%23201218'/%3E%3Cpath d='M14 44 31 11l7 15 12-6-7 13 8 5-15 1-5 14-5-13z' fill='%23e8b85a'/%3E%3Ccircle cx='31' cy='31' r='5' fill='%23912f2f'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="https://js.arcgis.com/4.33/esri/themes/dark/main.css">
+  <script src="https://js.arcgis.com/4.33/"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="app" aria-label="Datums and Dragons game">
+    <div id="map" aria-label="ArcGIS adventure map"></div><div class="map-vignette"></div>
+    <header class="topbar" style="transform:translateX(46px)">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">🐉</div><div><h1>Datums &amp; Dragons</h1><small>ArcGIS-powered fantasy adventure</small></div></div>
+      <div class="hud" aria-label="Player statistics">
+        <div class="stat" title="Health"><span>♥</span><div class="bar"><i id="hpBar"></i></div><span id="hpText">20</span></div>
+        <div class="stat" title="Mana"><span>✦</span><div class="bar mana"><i id="manaBar"></i></div><span id="manaText">12</span></div>
+        <div class="stat gold" title="Gold"><span>●</span><span id="goldText">0</span></div>
+      </div>
+    </header>
+    <section class="quest-card" aria-live="polite" style="transform:translateX(46px)">
+      <div class="eyebrow" id="chapter">Quest 1 of 5</div><h2 id="questTitle">The Emberpeak Egg Heist</h2>
+      <p id="questText"></p><div class="clue" id="clueText"></div><div class="objective" id="objective"></div>
+      <div class="quest-actions"><div class="action-row"><button class="game-btn secondary" id="revealBtn">✦ Scry (3 mana)</button><button class="game-btn" id="centerBtn">⌖ Center map</button></div><div class="action-row"><button class="game-btn secondary" id="shopBtn" type="button">● Map shop</button><button class="game-btn secondary" id="titleBtn" type="button">⌂ Title screen</button></div></div>
+    </section>
+    <div class="map-tip" id="mapTip">Click the map to choose your destination.</div>
+    <aside class="log"><strong id="logTitle">The Dungeon Master whispers…</strong><p id="logText">Choose a location. Fortune favors the bold and occasionally the wildly overconfident.</p></aside>
+    <div class="toast" id="toast" role="status"></div>
+  </main>
+
+  <div class="modal" id="introModal">
+    <div class="modal-card intro-layout">
+      <img class="intro-art" src="datums-dragons-art.png" alt="Dragon guarding a glowing mapped globe">
+      <div><div class="eyebrow">A map-powered misadventure</div><h2>Save the world. Try not to misproject it.</h2><p>Malachor the Misprojector stole five Datum Stones and scattered them across Earth. Track each stone on the ArcGIS map, survive the creature guarding it, and collect deeply impractical treasure.</p>
+        <div class="class-grid" id="classGrid">
+          <button class="class-card selected" data-class="Ranger"><b>🧭 Spatial Ranger</b><span>More health. Hits harder when the map guess is close.</span></button>
+          <button class="class-card" data-class="GeoMage"><b>🔮 GeoMage</b><span>More mana. Scrying reveals a smaller search zone.</span></button>
+          <button class="class-card" data-class="Rogue"><b>🗺️ Projection Rogue</b><span>Finds extra gold and has a knack for ridiculous luck.</span></button>
+        </div><button class="game-btn wide" id="startBtn">Begin the quest</button>
+      </div>
+    </div>
+    <div class="designer-credit">Designed by <a href="https://tbaker.com" target="_blank" rel="noopener noreferrer">Tom Baker</a></div>
+  </div>
+
+  <div class="modal" id="combatModal" hidden>
+    <div class="modal-card combat"><div class="eyebrow" id="encounterLabel">Encounter</div><div class="monster" id="monsterIcon">🐉</div><h2 id="monsterName">Embermaw</h2><p id="monsterTaunt"></p><div class="enemy-bar"><i id="enemyBar"></i></div><div class="roll" id="rollText">Roll for initiative!</div><div class="combat-actions"><button class="game-btn" id="strikeBtn">⚔ Roll &amp; strike</button><button class="game-btn secondary" id="spellBtn">✦ Wild spell (2 mana)</button><button class="game-btn secondary" id="potionBtn">🧪 Potion (<span id="potionCount">2</span>)</button></div></div>
+  </div>
+
+  <div class="modal" id="shopModal" hidden>
+    <div class="modal-card">
+      <div class="shop-head"><div><div class="eyebrow">The Questionable Cartographer</div><h2>Spend gold irresponsibly</h2></div><div class="shop-balance">● <span id="shopGold">0</span> gold</div></div>
+      <p>Practical supplies and lavish map-adjacent objects, all sold without warranty or a reliable north arrow.</p>
+      <div class="shop-grid" id="shopGrid">
+        <div class="shop-item"><b>✦ Bottled Prime Meridian</b><span>Restores 5 mana. Limit two per adventure because longitude is habit-forming.</span><button class="game-btn" data-buy="mana">30 gold</button></div>
+        <div class="shop-item"><b>🧭 Gilded Brunch Compass</b><span>Points toward the nearest brunch. Geographically dubious; socially essential.</span><button class="game-btn" data-buy="compass">45 gold</button></div>
+        <div class="shop-item"><b>🧐 Mercator Monocle</b><span>Makes Greenland look magnificent and everything else look judgmental.</span><button class="game-btn" data-buy="monocle">70 gold</button></div>
+        <div class="shop-item"><b>📏 Scale Bar of Excessive Grandeur</b><span>Solid gold, wildly impractical, and calibrated only in dragon-lengths.</span><button class="game-btn" data-buy="scalebar">110 gold</button></div>
+      </div>
+      <div class="shop-note" id="shopNote">The merchant accepts gold, compliments, and projections with documented limitations.</div>
+      <button class="game-btn secondary wide" id="closeShopBtn" type="button">Return to the map</button>
+    </div>
+  </div>
+
+  <div class="modal" id="victoryModal" hidden>
+    <div class="modal-card combat"><div class="loot">🏆</div><div class="eyebrow">The atlas is restored</div><h2>You defeated bad geography!</h2><p id="victoryText"></p><button class="game-btn wide" id="restartBtn">Play again</button></div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>
